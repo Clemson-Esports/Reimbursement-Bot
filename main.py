@@ -9,6 +9,8 @@ request_channel = 1027475253611466752  # Channel that the bot sends messages in.
 approved_channel = 1027475279293206560
 denied_channel = 1027475297563594762
 archived_channel = 1027475393646710814
+self_id = 1027441846793801738
+message_read_limit = 200
 version = '1.0'
 
 ######################
@@ -16,7 +18,8 @@ version = '1.0'
 
 
 valid_commands = ["$request", "$claim", "$status"]
-bot = commands.Bot(command_prefix='^')
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix='^', intents = intents)
 
 # Startup function.
 @bot.event
@@ -47,13 +50,18 @@ async def on_message(message):
         denied = bot.get_channel(denied_channel)
         archived = bot.get_channel(archived_channel)
 
+        # Get the last 200 messages from the request channel.
+        request_messages = [message async for message in request.history(limit=message_read_limit)]
+        user_requests = []
+        for message in request_messages:
+            
 
         # Request prompt.
         if message_array[0].startswith("$request"):
             if len(message_array) >= 3:
                 if float(message_array[1]) >= 0:
                     await message.channel.send("Ticket recieved!")
-                    sent = await request.send("-------\n" + "USR:\t" + str(message.author) + "\nAMT:\t" + str(message_array[1]) + "\nFOR:\t" + " ".join(message_array[2:]) + "\n-------")
+                    sent = await request.send(str(message.author.id) +"\n-------\n" + "USR:\t" + str(message.author) + "\nAMT:\t" + str(message_array[1]) + "\nFOR:\t" + " ".join(message_array[2:]) + "\n-------")
                     await sent.add_reaction('✅')
                     await sent.add_reaction('⛔')
         
@@ -72,9 +80,17 @@ async def on_message(message):
         await message.channel.send(f'My version number is: {version}')
 
 
+# When a reaction is added this function is called.
+@bot.event
+async def on_raw_reaction_add(payload):
+    # Don't trigger on self reactions.
+    if payload.user_id == self_id:
+        return
 
-
-
+    # Debug info.
+    #print("Message id: " + str(payload.message_id))
+    #print("User id: " + str(payload.user_id))
+    return
 
 
 
