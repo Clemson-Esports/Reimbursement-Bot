@@ -50,11 +50,34 @@ async def on_message(message):
         denied = bot.get_channel(denied_channel)
         archived = bot.get_channel(archived_channel)
 
-        # Get the last 200 messages from the request channel.
+        # Get the last 200 messages from the 4 channels.
         request_messages = [message async for message in request.history(limit=message_read_limit)]
+        approved_messages = [message async for message in approved.history(limit=message_read_limit)]
+        denied_messages = [message async for message in denied.history(limit=message_read_limit)]
+        archived_messages = [message async for message in archived.history(limit=message_read_limit)]
+        # Find all requests from user and store in an array.
         user_requests = []
-        for message in request_messages:
-            
+        user_approved = []
+        user_denied = []
+        user_archived = []
+
+        for msg in request_messages:
+            if int(msg.content.partition('\n')[0]) == message.author.id:
+                user_requests.append(msg.content)
+
+         for msg in approved_messages:
+            if int(msg.content.partition('\n')[0]) == message.author.id:
+                user_approved.append(msg.content)
+
+        for msg in denied_messages:
+            if int(msg.content.partition('\n')[0]) == message.author.id:
+                user_denied.append(msg.content)   
+
+        for msg in archived_messages:
+            if int(msg.content.partition('\n')[0]) == message.author.id:
+                user_archived.append(msg.content)
+
+        user_msg_count = len(user_requests) + len(user_approved) +len(user_denied) +len(user_archived)
 
         # Request prompt.
         if message_array[0].startswith("$request"):
@@ -86,6 +109,8 @@ async def on_raw_reaction_add(payload):
     # Don't trigger on self reactions.
     if payload.user_id == self_id:
         return
+
+    
 
     # Debug info.
     #print("Message id: " + str(payload.message_id))
