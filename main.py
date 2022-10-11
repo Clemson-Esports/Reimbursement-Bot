@@ -24,8 +24,17 @@ bot = commands.Bot(command_prefix='^', intents = intents)
 # Startup function.
 @bot.event
 async def on_ready():
-    
     print('Bot is online')
+
+
+
+# Need to make a function to send messages in a given format to improve readability.
+
+# Need error checking function also.
+
+# Need a function to move messages between channels. 
+
+# Need a function to send DMs back to users.
 
 
 # On message event.
@@ -62,19 +71,19 @@ async def on_message(message):
         user_archived = []
 
         for msg in request_messages:
-            if int(msg.content.partition('\n')[0]) == message.author.id:
+            if msg.author == self_id and int(msg.content.partition('\n')[0]) == message.author.id:
                 user_requests.append(msg.content)
 
-         for msg in approved_messages:
-            if int(msg.content.partition('\n')[0]) == message.author.id:
+        for msg in approved_messages:
+            if msg.author == self_id and int(msg.content.partition('\n')[0]) == message.author.id:
                 user_approved.append(msg.content)
 
         for msg in denied_messages:
-            if int(msg.content.partition('\n')[0]) == message.author.id:
-                user_denied.append(msg.content)   
+            if msg.author == self_id and int(msg.content.partition('\n')[0]) == message.author.id:
+                user_denied.append(msg.content)
 
         for msg in archived_messages:
-            if int(msg.content.partition('\n')[0]) == message.author.id:
+            if msg.author == self_id and int(msg.content.partition('\n')[0]) == message.author.id:
                 user_archived.append(msg.content)
 
         user_msg_count = len(user_requests) + len(user_approved) +len(user_denied) +len(user_archived)
@@ -83,6 +92,7 @@ async def on_message(message):
         if message_array[0].startswith("$request"):
             if len(message_array) >= 3:
                 if float(message_array[1]) >= 0:
+                    print("Ticket Recieved!")
                     await message.channel.send("Ticket recieved!")
                     sent = await request.send(str(message.author.id) +"\n-------\n" + "USR:\t" + str(message.author) + "\nAMT:\t" + str(message_array[1]) + "\nFOR:\t" + " ".join(message_array[2:]) + "\n-------")
                     await sent.add_reaction('✅')
@@ -106,11 +116,36 @@ async def on_message(message):
 # When a reaction is added this function is called.
 @bot.event
 async def on_raw_reaction_add(payload):
+
+    # Get channels
+    request = bot.get_channel(request_channel)
+    approved = bot.get_channel(approved_channel)
+    denied = bot.get_channel(denied_channel)
+    archived = bot.get_channel(archived_channel)
+
     # Don't trigger on self reactions.
     if payload.user_id == self_id:
         return
 
-    
+    # The reactions here need to be made into a function and a state machine
+    # needs to be made to move the messages between channels.
+
+    if payload.channel_id == request_channel and str(payload.emoji) == '✅':
+        msgID = payload.message_id
+        msg = await request.fetch_message(msgID)
+        msgStr = msg.content
+        sent = await approved.send(msgStr)
+        await sent.add_reaction('✅')
+        await sent.add_reaction('⛔')
+        await msg.delete()
+
+    if payload.channel_id == request_channel and str(payload.emoji) == '⛔':
+        msgID = payload.message_id
+        msg = await request.fetch_message(msgID)
+        msgStr = msg.content
+        sent = await denied.send(msgStr)
+        await sent.add_reaction('✅')
+        await msg.delete()
 
     # Debug info.
     #print("Message id: " + str(payload.message_id))
