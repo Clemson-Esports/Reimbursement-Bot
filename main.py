@@ -5,10 +5,16 @@ import os
 from dataclasses import dataclass
 
 ### IMPORTANT VARS ###
-request_channel = 1027475253611466752  # Channel that the bot sends messages in.
-approved_channel = 1027475279293206560
-denied_channel = 1027475297563594762
-archived_channel = 1027475393646710814
+#request_channel = 1027475253611466752  # Channel that the bot sends messages in.
+#approved_channel = 1027475279293206560
+#denied_channel = 1027475297563594762
+#archived_channel = 1027475393646710814
+
+request_channel = 1032135191558373446  # Channel that the bot sends messages in.
+approved_channel = 1032135238891085854
+denied_channel = 1032135266074378250
+archived_channel = 1032135328590462986
+
 channels = [request_channel, approved_channel, denied_channel, archived_channel]
 self_id = 1027441846793801738
 message_read_limit = 200
