@@ -1,4 +1,5 @@
 import discord
+import config
 import requests
 from discord.ext import commands
 import os
@@ -198,4 +199,4 @@ async def on_raw_reaction_add(payload):
 
 
 
-bot.run('MTAyNzQ0MTg0Njc5MzgwMTczOA.GQJRdz.TWoNE0NKjHooJzwXSdMa9bN7qD3JXS1AwFH_e0')
+bot.run(config.api_key)
