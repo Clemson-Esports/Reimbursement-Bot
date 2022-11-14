@@ -39,9 +39,6 @@ async def on_ready():
 
 # Need error checking function also.
 
-# Need a function to move messages between channels. 
-
-# Need a function to send DMs back to users.
 
 async def move_message(current_channel, move_channel, message_payload):
     msgID = message_payload.message_id
